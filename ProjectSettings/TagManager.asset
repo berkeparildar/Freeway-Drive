@@ -3,7 +3,18 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Mini
+  - Bus
+  - Golf
+  - Pickup
+  - Doblo
+  - Truck
+  - Sport
+  - Tanker
+  - Ghost
+  - Handle
+  - Money
   layers:
   - Default
   - TransparentFX
@@ -11,7 +22,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Car
   - 
   - 
   - 

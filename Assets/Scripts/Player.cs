@@ -6,19 +6,19 @@ public class Player : MonoBehaviour
 {
     private Car _car;
     private float _speed;
+    private Animator _animator;
     private Animator _carAnimator;
     private float _turnSpeed;
     private bool _canTurnAgain = true;
-    private float _roadInitTarget = 5;
-    private GameManager _gameManager;
+    private bool _hasCrashed;
     void Start()
     {
         _speed = 3;
         _turnSpeed = 2; 
         _car = transform.GetChild(0).GetComponent<Car>();
+        _animator = GetComponent<Animator>();
         _carAnimator = _car.GetComponent<Animator>();
         StartCoroutine(SpeedIncreaseCoroutine());
-        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     void Update()
@@ -45,18 +45,38 @@ public class Player : MonoBehaviour
 
     private IEnumerator SpeedIncreaseCoroutine()
     {
-        while (true)
+        while (!_hasCrashed)
         {
             _speed += 1;
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(4);
+        }
+        yield return null;
+    }
+
+    public float GetSpeed()
+    {
+        return _speed;
+    }
+
+    public void IncreaseHandling()
+    {
+        _turnSpeed *= 0.95f;
+        _carAnimator.speed /= 0.95f;
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Car"))
+        {
+            _animator.SetTrigger("crash");
+            StartCoroutine(StopCarsRoutine());
+            _hasCrashed = true;
+            _speed = 0;
         }
     }
 
-    private void CreateRoad()
+    private IEnumerator StopCarsRoutine()
     {
-        if (transform.position.z >= _roadInitTarget)
-        {
-            _roadInitTarget += 5;
-        }
+        yield return new WaitForSeconds(1);
+        GameManager.StopAllCars();
     }
 }

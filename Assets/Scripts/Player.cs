@@ -5,16 +5,16 @@ using DG.Tweening;
 public class Player : MonoBehaviour
 {
     private Car _car;
-    private float _speed;
+    [SerializeField] private float _speed;
     private Animator _animator;
     private Animator _carAnimator;
     private float _turnSpeed;
     private bool _canTurnAgain = true;
-    private bool _hasCrashed;
+    public static bool HasCrashed;
     void Start()
     {
         _speed = 3;
-        _turnSpeed = 2; 
+        _turnSpeed = 2;
         _car = transform.GetChild(0).GetComponent<Car>();
         _animator = GetComponent<Animator>();
         _carAnimator = _car.GetComponent<Animator>();
@@ -28,24 +28,27 @@ public class Player : MonoBehaviour
 
     private void Movement()
     {
-        transform.Translate(_speed * Time.deltaTime * Vector3.forward);
-        if (Input.GetKeyDown(KeyCode.A) && transform.position.x != -10 && _canTurnAgain)
+        if (!HasCrashed)
         {
-            _canTurnAgain = false;
-            _carAnimator.SetTrigger("left");
-            transform.DOMoveX(-2.5f, _turnSpeed).SetRelative().OnComplete(() => {_canTurnAgain = true;});
-        }
-        else if (Input.GetKeyDown(KeyCode.D) && transform.position.x != -2.5f && _canTurnAgain)
-        {
-            _canTurnAgain = false;
-            _carAnimator.SetTrigger("right");
-            transform.DOMoveX(2.5f, _turnSpeed).SetRelative().OnComplete(() => {_canTurnAgain = true;});
+            transform.Translate(_speed * Time.deltaTime * Vector3.forward);
+            if (Input.GetKeyDown(KeyCode.A) && transform.position.x != -10 && _canTurnAgain)
+            {
+                _canTurnAgain = false;
+                _carAnimator.SetTrigger("left");
+                transform.DOMoveX(-2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
+            }
+            else if (Input.GetKeyDown(KeyCode.D) && transform.position.x != -2.5f && _canTurnAgain)
+            {
+                _canTurnAgain = false;
+                _carAnimator.SetTrigger("right");
+                transform.DOMoveX(2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
+            }
         }
     }
 
-    private IEnumerator SpeedIncreaseCoroutine()
+    public IEnumerator SpeedIncreaseCoroutine()
     {
-        while (!_hasCrashed)
+        while (!HasCrashed)
         {
             _speed += 1;
             yield return new WaitForSeconds(4);
@@ -64,19 +67,12 @@ public class Player : MonoBehaviour
         _carAnimator.speed /= 0.95f;
     }
 
-    private void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other)
+    {
         if (other.gameObject.layer == LayerMask.NameToLayer("Car"))
         {
             _animator.SetTrigger("crash");
-            StartCoroutine(StopCarsRoutine());
-            _hasCrashed = true;
-            _speed = 0;
+            HasCrashed = true;
         }
-    }
-
-    private IEnumerator StopCarsRoutine()
-    {
-        yield return new WaitForSeconds(1);
-        GameManager.StopAllCars();
     }
 }

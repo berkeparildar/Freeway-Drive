@@ -7,11 +7,16 @@ public class PowerUp : MonoBehaviour
     [SerializeField] private Material _ghostMat;
     private GameObject _player;
     public DG.Tweening.Core.TweenerCore<Quaternion, Vector3, DG.Tweening.Plugins.Options.QuaternionOptions> turnTween;
+    private bool _isGhost;
 
     void Start()
     {
         _player = GameObject.Find("Player");
         turnTween = transform.DORotate(new Vector3(0, 180, 0), 2).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
+    }
+
+    private void Update() {
+        KillIfBehind();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -22,13 +27,14 @@ public class PowerUp : MonoBehaviour
             {
                 case "Ghost":
                     StartCoroutine(GhostRoutine());
+                    _isGhost = true;
                     DOTween.Kill(transform);
                     transform.GetChild(0).gameObject.SetActive(false);
                     break;
                 case "Handle":
                     IncreaseHandling();
                     DOTween.Kill(transform);
-                    Destroy(this.gameObject);
+                    Destroy(this.gameObject);   
                     break;
                 case "Money":
                     var randomMoney = Random.Range(40, 61);
@@ -61,5 +67,14 @@ public class PowerUp : MonoBehaviour
     {
         var player = _player.GetComponent<Player>();
         player.IncreaseHandling();
+    }
+
+    private void KillIfBehind()
+    {
+        if (_player.transform.position.z > transform.position.z + 10 && !_isGhost)
+        {
+            DOTween.Kill(transform);
+            Destroy(this.gameObject);
+        }
     }
 }

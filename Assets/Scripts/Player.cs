@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     private float _turnSpeed;
     private bool _canTurnAgain = true;
     public static bool HasCrashed;
+    private Vector2 _touchStartPosition;
     void Start()
     {
         _speed = 3;
@@ -27,24 +28,42 @@ public class Player : MonoBehaviour
     }
 
     private void Movement()
+{
+    if (!HasCrashed)
     {
-        if (!HasCrashed)
+        transform.Translate(_speed * Time.deltaTime * Vector3.forward);
+
+        if (Input.touchCount > 0)
         {
-            transform.Translate(_speed * Time.deltaTime * Vector3.forward);
-            if (Input.GetKeyDown(KeyCode.A) && transform.position.x != -10 && _canTurnAgain)
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Began)
             {
-                _canTurnAgain = false;
-                _carAnimator.SetTrigger("left");
-                transform.DOMoveX(-2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
+                _touchStartPosition = touch.position;
             }
-            else if (Input.GetKeyDown(KeyCode.D) && transform.position.x != -2.5f && _canTurnAgain)
+            else if (touch.phase == TouchPhase.Ended)
             {
-                _canTurnAgain = false;
-                _carAnimator.SetTrigger("right");
-                transform.DOMoveX(2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
+                Vector2 swipeDelta = touch.position - _touchStartPosition;
+
+                if (Mathf.Abs(swipeDelta.x) > 192 )
+                {
+                    if (swipeDelta.x < 0 && transform.position.x != -10 && _canTurnAgain)
+                    {
+                        _canTurnAgain = false;
+                        _carAnimator.SetTrigger("left");
+                        transform.DOMoveX(-2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
+                    }
+                    else if (swipeDelta.x > 0 && transform.position.x != -2.5f && _canTurnAgain)
+                    {
+                        _canTurnAgain = false;
+                        _carAnimator.SetTrigger("right");
+                        transform.DOMoveX(2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
+                    }
+                }
             }
         }
     }
+}
 
     public IEnumerator SpeedIncreaseCoroutine()
     {

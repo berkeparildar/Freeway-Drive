@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 public class PowerUp : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class PowerUp : MonoBehaviour
     private GameObject _player;
     public DG.Tweening.Core.TweenerCore<Quaternion, Vector3, DG.Tweening.Plugins.Options.QuaternionOptions> turnTween;
     private bool _isGhost;
+    public GameObject powerUpText;
 
     void Start()
     {
@@ -28,17 +30,42 @@ public class PowerUp : MonoBehaviour
                 case "Ghost":
                     StartCoroutine(GhostRoutine());
                     _isGhost = true;
+                    var ghostPop = Instantiate(powerUpText, transform.position, Quaternion.identity);
+                    ghostPop.transform.SetParent(_player.transform);
+                    var colorG = ghostPop.GetComponent<TextMeshPro>().color;
+                    var targetColorG = new Color(colorG.r, colorG.g, colorG.b, 0);
+                    ghostPop.GetComponent<TextMeshPro>().DOColor(targetColorG, 1);
+                    ghostPop.transform.DOMoveY(2, 1).SetRelative().OnComplete(() => {
+                        Destroy(ghostPop);
+                    });
                     DOTween.Kill(transform);
                     transform.GetChild(0).gameObject.SetActive(false);
                     break;
                 case "Handle":
                     IncreaseHandling();
+                    var handlingPop = Instantiate(powerUpText, transform.position, Quaternion.identity);
+                    handlingPop.transform.SetParent(_player.transform);
+                    var color = handlingPop.GetComponent<TextMeshPro>().color;
+                    var targetColor = new Color(color.r, color.g, color.b, 0);
+                    handlingPop.GetComponent<TextMeshPro>().DOColor(targetColor, 1);
+                    handlingPop.transform.DOMoveY(2, 1).SetRelative().OnComplete(() => {
+                        Destroy(handlingPop);
+                    });
                     DOTween.Kill(transform);
                     Destroy(this.gameObject);   
                     break;
                 case "Money":
                     var randomMoney = Random.Range(40, 61);
                     GameManager.IncreaseMoney(randomMoney);
+                    var moneyPop = Instantiate(powerUpText, transform.position, Quaternion.identity);
+                    moneyPop.transform.SetParent(_player.transform);
+                    moneyPop.GetComponent<TextMeshPro>().text = randomMoney + "$";
+                    var colorM = moneyPop.GetComponent<TextMeshPro>().color;
+                    var targetColorM = new Color(colorM.r, colorM.g, colorM.b, 0);
+                    moneyPop.GetComponent<TextMeshPro>().DOColor(targetColorM, 1);
+                    moneyPop.transform.DOMoveY(2, 1).SetRelative().OnComplete(() => {
+                        Destroy(moneyPop);
+                    });
                     DOTween.Kill(transform);
                     Destroy(this.gameObject);
                     break;

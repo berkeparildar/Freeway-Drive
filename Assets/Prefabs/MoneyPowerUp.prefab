@@ -96,6 +96,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _ghostMat: {fileID: 2100000, guid: 236ea4cab58e948ba9214099b5ea811d, type: 2}
+  powerUpText: {fileID: 909161342006613822, guid: 388d4159f30d83c4282da3dbb041aca7, type: 3}
 --- !u!1001 &2153646128584570230
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI allTimeScore;
     public Animator playerAnimator;
     public Animator UIAnimator;
+    public MeshRenderer carRenderer;
     private static int _currentRoadLocation;
     private static int _playerTargetPos;
     private static int _money;
@@ -31,6 +32,9 @@ public class GameManager : MonoBehaviour
     private bool _crashInit;
     [SerializeField] private GameObject _player;
     public static Dictionary<string, float> _spawnPointsIndex = new();
+    public Material[] colors;
+    [SerializeField] RewardedAdsButton rewardedAdsButton;
+
 
     void Start()
     {
@@ -46,12 +50,7 @@ public class GameManager : MonoBehaviour
         _spawnPointsIndex.Add("Sport", 7.938f);
         _spawnPointsIndex.Add("Truck", 8.5f);
         _spawnPointsIndex.Add("Tanker", 8.384f);
-        StartCoroutine(IncreaseScore());
-        speedIndicator.transform.DORotate(new Vector3(0, 0, -180), 90).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
-        for (int i = 0; i < 10; i++)
-        {
-            GenerateRoad();
-        }
+        StartCoroutine(StartGame());
     }
 
     void Update()
@@ -118,6 +117,7 @@ public class GameManager : MonoBehaviour
             DOTween.Kill(speedIndicator.transform);
             gameUI.SetActive(false);
             menuUI.SetActive(true);
+            rewardedAdsButton.LoadAd();
         }
     }
 
@@ -166,6 +166,7 @@ public class GameManager : MonoBehaviour
         totalMoney.text = currentMoney.ToString();
         currentScore.text = _score.ToString();
         allTimeScore.text = PlayerPrefs.GetInt("HighScore", 0).ToString();
+        PlayerPrefs.SetInt("Money", currentMoney);
         PlayerPrefs.Save();
     }
 
@@ -177,4 +178,42 @@ public class GameManager : MonoBehaviour
         _spawnPointsIndex.Clear();
         Player.HasCrashed = false;
     }
+
+    private IEnumerator StartGame()
+    {
+        SetColor();
+        reviveCountDown.gameObject.SetActive(true);
+        reviveCountDown.text = "3";
+        yield return new WaitForSeconds(1);
+        reviveCountDown.text = "2";
+        yield return new WaitForSeconds(1);
+        reviveCountDown.text = "1";
+        yield return new WaitForSeconds(1);
+        reviveCountDown.gameObject.SetActive(false);
+        _player.GetComponent<Player>().enabled = true;
+        StartCoroutine(IncreaseScore());
+        speedIndicator.transform.DORotate(new Vector3(0, 0, -180), 90).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
+        for (int i = 0; i < 10; i++)
+        {
+            GenerateRoad();
+        }
+    }
+
+    private void SetColor()
+    {
+        var currentColor = PlayerPrefs.GetInt("Color", 0);
+        var currentMaterials = carRenderer.materials;
+        currentMaterials[0] = colors[currentColor];
+        carRenderer.materials = currentMaterials;
+    }
+
+    public void GoToMenu()
+    {
+        DOTween.KillAll();
+        Player.HasCrashed = false;
+        _spawnPointsIndex.Clear();
+        Player.HasCrashed = false;
+        SceneManager.LoadScene(0);
+    }
+
 }

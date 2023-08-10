@@ -181,6 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _ghostMat: {fileID: 2100000, guid: 236ea4cab58e948ba9214099b5ea811d, type: 2}
+  powerUpText: {fileID: 4403809344191446581, guid: ea44f8994e13de14f9c823c12c7c6899, type: 3}
 --- !u!1 &7672019196502041408
 GameObject:
   m_ObjectHideFlags: 0

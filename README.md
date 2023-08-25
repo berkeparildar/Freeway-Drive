@@ -1,10 +1,8 @@
 # Freeway Drive
 
-<img src="media/play.gif" alt="Gameplay Screenshot" width="10%">
-
-## Description
-
 Freeway Drive is an exhilarating endless driving game where players take control of a constantly moving car on a busy freeway. The car gradually gains speed as the game progresses, challenging players' reflexes and decision-making. The speedometer at the bottom left corner displays the car's current speed. The objective is to avoid colliding with randomly generated cars on the freeway for as long as possible. To navigate through the traffic, players can swipe left or right to change lanes. 
+
+<img src="media/play.gif" alt="Gameplay Screenshot" width="50%">
 
 ## How to Play
 
@@ -17,3 +15,6 @@ Freeway Drive is an exhilarating endless driving game where players take control
 - Customize your car's color using one of the six available color options, each costing 100$.
 - If you crash, you can watch a rewarded ad video to continue the game from where you left off.
 - Reach the highest score possible by surviving as long as you can, combining top speed and survival time.
+
+## Gameplay Video
+[![Gameplay Preview](https://img.youtube.com/vi/u6CHQkcB8Vs/0.jpg)](https://www.youtube.com/watch?v=u6CHQkcB8Vs)

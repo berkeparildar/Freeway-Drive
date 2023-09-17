@@ -4,94 +4,142 @@ using DG.Tweening;
 
 public class Player : MonoBehaviour
 {
-    private Car _car;
-    [SerializeField] private float _speed;
-    private Animator _animator;
-    private Animator _carAnimator;
-    private float _turnSpeed;
-    private bool _canTurnAgain = true;
-    public static bool HasCrashed;
-    private Vector2 _touchStartPosition;
-    void Start()
+    [SerializeField] private Car car;
+    [SerializeField] private float speed;
+    [SerializeField] private Animator animator;
+    [SerializeField] private Animator carAnimator;
+    [SerializeField] private float turnSpeed;
+    [SerializeField] private bool canTurnAgain = true;
+    [SerializeField] private Vector2 touchStartPosition;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip carSoundTwo;
+    [SerializeField] private AudioClip carSoundThree;
+    [SerializeField] private int revolutionCount;
+    [SerializeField] private int maxRpm;
+    [SerializeField] private float startingPitch;
+    private static readonly int Gear = Animator.StringToHash("gear");
+    public static bool hasCrashed;
+    private static readonly int Crash = Animator.StringToHash("crash");
+    private static readonly int Left = Animator.StringToHash("left");
+    private static readonly int Right = Animator.StringToHash("right");
+
+    private void Start()
     {
-        _speed = 3;
-        _turnSpeed = 2;
-        _car = transform.GetChild(0).GetComponent<Car>();
-        _animator = GetComponent<Animator>();
-        _carAnimator = _car.GetComponent<Animator>();
         StartCoroutine(SpeedIncreaseCoroutine());
+        StartCoroutine(CarSoundCoroutine());
     }
 
-    void Update()
+    private void Update()
     {
         Movement();
     }
 
     private void Movement()
-{
-    if (!HasCrashed)
     {
-        transform.Translate(_speed * Time.deltaTime * Vector3.forward);
-
-        if (Input.touchCount > 0)
+        if (hasCrashed) return;
+        transform.Translate(speed * Time.deltaTime * Vector3.forward);
+        if (Input.touchCount <= 0) return;
+        var touch = Input.GetTouch(0);
+        if (touch.phase == TouchPhase.Began)
         {
-            Touch touch = Input.GetTouch(0);
+            touchStartPosition = touch.position;
+        }
+        else if (touch.phase == TouchPhase.Ended)
+        {
+            Vector2 swipeDelta = touch.position - touchStartPosition;
 
-            if (touch.phase == TouchPhase.Began)
+            if (Mathf.Abs(swipeDelta.x) > 192)
             {
-                _touchStartPosition = touch.position;
-            }
-            else if (touch.phase == TouchPhase.Ended)
-            {
-                Vector2 swipeDelta = touch.position - _touchStartPosition;
-
-                if (Mathf.Abs(swipeDelta.x) > 192 )
+                if (swipeDelta.x < 0 && transform.position.x != -10 && canTurnAgain)
                 {
-                    if (swipeDelta.x < 0 && transform.position.x != -10 && _canTurnAgain)
-                    {
-                        _canTurnAgain = false;
-                        _carAnimator.SetTrigger("left");
-                        transform.DOMoveX(-2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
-                    }
-                    else if (swipeDelta.x > 0 && transform.position.x != -2.5f && _canTurnAgain)
-                    {
-                        _canTurnAgain = false;
-                        _carAnimator.SetTrigger("right");
-                        transform.DOMoveX(2.5f, _turnSpeed).SetRelative().OnComplete(() => { _canTurnAgain = true; });
-                    }
+                    canTurnAgain = false;
+                    carAnimator.SetTrigger(Left);
+                    transform.DOMoveX(-2.5f, turnSpeed).SetRelative()
+                        .OnComplete(() => { canTurnAgain = true; });
+                }
+                else if (swipeDelta.x > 0 && transform.position.x != -2.5f && canTurnAgain)
+                {
+                    canTurnAgain = false;
+                    carAnimator.SetTrigger(Right);
+                    transform.DOMoveX(2.5f, turnSpeed).SetRelative().OnComplete(() => { canTurnAgain = true; });
                 }
             }
         }
     }
-}
 
     public IEnumerator SpeedIncreaseCoroutine()
     {
-        while (!HasCrashed)
+        while (!hasCrashed)
         {
-            _speed += 1;
-            yield return new WaitForSeconds(4);
+            speed += 0.2f;
+            yield return new WaitForSeconds(0.8f);
         }
         yield return null;
     }
 
     public float GetSpeed()
     {
-        return _speed;
+        return speed;
     }
 
     public void IncreaseHandling()
     {
-        _turnSpeed *= 0.95f;
-        _carAnimator.speed /= 0.95f;
+        turnSpeed *= 0.95f;
+        carAnimator.speed /= 0.95f;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Car"))
+        if (other.gameObject.layer != LayerMask.NameToLayer("Car")) return;
+        carAnimator.SetTrigger(Crash);
+        hasCrashed = true;
+    }
+
+    public IEnumerator CarSoundCoroutine()
+    {
+        if (!hasCrashed)
         {
-            _animator.SetTrigger("crash");
-            HasCrashed = true;
+            while (revolutionCount < maxRpm)
+            {
+                if (hasCrashed)
+                {
+                    yield break;
+                }
+                audioSource.pitch += 0.001f;
+                revolutionCount++;
+                yield return new WaitForSeconds(0.033f);
+            }
+            if (audioSource.clip == carSoundThree)
+            {
+                yield break;
+            }
+            carAnimator.SetTrigger(Gear);
+            yield return StartCoroutine(GearShiftRoutine(true));
+            revolutionCount = 0;
+            startingPitch += 0.5f;
+            audioSource.pitch = startingPitch;
+            audioSource.clip = audioSource.clip == carSoundTwo ? carSoundThree : carSoundTwo;
+            audioSource.Play();
+            yield return StartCoroutine(GearShiftRoutine(false));
+            yield return StartCoroutine(CarSoundCoroutine());
+        }
+        else
+        {
+            yield break;
+        }
+    }
+
+    private IEnumerator GearShiftRoutine(bool direction)
+    {
+        while (audioSource.volume > 0.05f && direction)
+        {
+            audioSource.volume -= 0.09f;
+            yield return new WaitForSeconds(0.05f);
+        }
+        while (audioSource.volume < 0.5f && !direction)
+        {
+            audioSource.volume += 0.09f;
+            yield return new WaitForSeconds(0.05f);
         }
     }
 }

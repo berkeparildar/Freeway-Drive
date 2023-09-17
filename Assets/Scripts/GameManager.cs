@@ -3,57 +3,64 @@ using TMPro;
 using UnityEngine;
 using DG.Tweening;
 using System.Collections;
+using Cinemachine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject roadContainer;
-    public GameObject carContainer;
-    public GameObject roadPrefab;
-    public GameObject speedIndicator;
-    public GameObject gameUI;
-    public GameObject menuUI;
-    public GameObject recordText;
-    public TextMeshProUGUI reviveCountDown;
-    public TextMeshProUGUI moneyText;
-    public TextMeshProUGUI speedText;
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI collectedMoney;
-    public TextMeshProUGUI totalMoney;
-    public TextMeshProUGUI currentScore;
-    public TextMeshProUGUI allTimeScore;
-    public Animator playerAnimator;
-    public Animator UIAnimator;
-    public MeshRenderer carRenderer;
+    [SerializeField] private GameObject roadContainer;
+    [SerializeField] private GameObject carContainer;
+    [SerializeField] private GameObject roadPrefab;
+    [SerializeField] private GameObject speedIndicator;
+    [SerializeField] private GameObject gameUI;
+    [SerializeField] private GameObject menuUI;
+    [SerializeField] private GameObject recordText;
+    [SerializeField] private TextMeshProUGUI reviveCountDown;
+    [SerializeField] private TextMeshProUGUI moneyText;
+    [SerializeField] private TextMeshProUGUI speedText;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI collectedMoney;
+    [SerializeField] private TextMeshProUGUI totalMoney;
+    [SerializeField] private TextMeshProUGUI currentScore;
+    [SerializeField] private TextMeshProUGUI allTimeScore;
+    [SerializeField] private Animator carAnimator;
+    [SerializeField] private Animator uiAnimator;
+    [SerializeField] private MeshRenderer carRenderer;
+    [SerializeField] private bool crashInit;
+    [SerializeField] private GameObject player;
+    [SerializeField] private Material[] colors;
+    [SerializeField] private RewardedAdsButton rewardedAdsButton;
+    [SerializeField] private AudioSource crash;
+    [SerializeField] private AudioSource playerSource;
+    [SerializeField] private CinemachineVirtualCamera followCamera;
+    [SerializeField] private CinemachineVirtualCamera deathCamera;
+    public static readonly Dictionary<string, float> SpawnPointsIndex = new();
+    public static bool playedAd;
     private static int _currentRoadLocation;
     private static int _playerTargetPos;
     private static int _money;
-    private static int _score;
-    private bool _crashInit;
-    [SerializeField] private GameObject _player;
-    public static Dictionary<string, float> _spawnPointsIndex = new();
-    public Material[] colors;
-    [SerializeField] RewardedAdsButton rewardedAdsButton;
+    private static int _score; 
+    private static readonly int ShowScore = Animator.StringToHash("showScore");
+    private static readonly int Revive = Animator.StringToHash("revive");
 
-
-    void Start()
+    private void Start()
     {
         _score = 0;
         _money = 0;
         _playerTargetPos = 15;
         _currentRoadLocation = 90;
-        _spawnPointsIndex.Add("Bus", 8.32f);
-        _spawnPointsIndex.Add("Mini", 7.922f);
-        _spawnPointsIndex.Add("Golf", 7.895f);
-        _spawnPointsIndex.Add("Pickup", 7.895f);
-        _spawnPointsIndex.Add("Doblo", 8.139f);
-        _spawnPointsIndex.Add("Sport", 7.938f);
-        _spawnPointsIndex.Add("Truck", 8.5f);
-        _spawnPointsIndex.Add("Tanker", 8.384f);
+        SpawnPointsIndex.Add("Bus", 8.32f);
+        SpawnPointsIndex.Add("Mini", 7.922f);
+        SpawnPointsIndex.Add("Golf", 7.895f);
+        SpawnPointsIndex.Add("Pickup", 7.995f);
+        SpawnPointsIndex.Add("Doblo", 8.139f);
+        SpawnPointsIndex.Add("Sport", 7.938f);
+        SpawnPointsIndex.Add("Truck", 8.5f);
+        SpawnPointsIndex.Add("Tanker", 8.384f);
         StartCoroutine(StartGame());
     }
 
-    void Update()
+    private void Update()
     {
         UpdateUI();
         CheckPlayerPosition();
@@ -62,14 +69,14 @@ public class GameManager : MonoBehaviour
 
     private void CheckPlayerPosition()
     {
-        if (_player.transform.position.z >= _playerTargetPos)
+        if (player.transform.position.z >= _playerTargetPos)
         {
             GenerateRoad();
             _playerTargetPos += 15;
         }
     }
 
-    public void GenerateRoad()
+    private void GenerateRoad()
     {
         var createdRoad = Instantiate(roadPrefab, new Vector3(0, 0, _currentRoadLocation), Quaternion.identity);
         createdRoad.transform.SetParent(roadContainer.transform);
@@ -85,7 +92,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator StopAllCars()
     {
         yield return new WaitForSeconds(1);
-        for (int i = 0; i < carContainer.transform.childCount; i++)
+        for (var i = 0; i < carContainer.transform.childCount; i++)
         {
             carContainer.transform.GetChild(i).GetComponent<TrafficCars>().Stop();
         }
@@ -94,13 +101,13 @@ public class GameManager : MonoBehaviour
     private void UpdateUI()
     {
         moneyText.text = _money.ToString();
-        speedText.text = (_player.GetComponent<Player>().GetSpeed() * 5).ToString();
-        scoreText.text = (_player.GetComponent<Player>().GetSpeed() + _score).ToString();
+        speedText.text = (Mathf.Round(player.GetComponent<Player>().GetSpeed() * 5)).ToString();
+        scoreText.text = (_score).ToString();
     }
 
     private IEnumerator IncreaseScore()
     {
-        while (!Player.HasCrashed)
+        while (!Player.hasCrashed)
         {
             _score += 1;
             yield return new WaitForSeconds(0.2f);
@@ -110,21 +117,27 @@ public class GameManager : MonoBehaviour
 
     private void CheckCrash()
     {
-        if (Player.HasCrashed && !_crashInit)
-        {
-            _crashInit = true;
-            StartCoroutine(StopAllCars());
-            DOTween.Kill(speedIndicator.transform);
-            gameUI.SetActive(false);
-            menuUI.SetActive(true);
-            rewardedAdsButton.LoadAd();
-        }
+        if (!Player.hasCrashed || crashInit) return;
+        followCamera.Priority -= 1;
+        deathCamera.Priority += 1;
+        crashInit = true;
+        StartCoroutine(StopAllCars());
+        crash.Play();
+        playerSource.Stop();
+        DOTween.Kill(speedIndicator.transform);
+        gameUI.SetActive(false);
+        menuUI.SetActive(true);
+        if (playedAd) return;
+        playedAd = true;
+        rewardedAdsButton.LoadAd();
     }
 
     public void ContinueGame()
     {
         for (int i = 0; i < carContainer.transform.childCount; i++)
         {
+            DOTween.instance.DOKill(carContainer.transform.GetChild(i).transform);
+            DOTween.Kill(carContainer.transform.GetChild(i).transform);
             Destroy(carContainer.transform.GetChild(i).gameObject);
         }
         StartCoroutine(ReviveRoutine());
@@ -132,9 +145,11 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ReviveRoutine()
     {
+        followCamera.Priority += 1;
+        deathCamera.Priority -= 1;
         menuUI.SetActive(false);
         gameUI.SetActive(true);
-        playerAnimator.SetTrigger("revive");
+        carAnimator.SetTrigger(Revive);
         yield return new WaitForSeconds(1.5f);
         reviveCountDown.gameObject.SetActive(true);
         reviveCountDown.text = "3";
@@ -144,16 +159,18 @@ public class GameManager : MonoBehaviour
         reviveCountDown.text = "1";
         yield return new WaitForSeconds(1);
         reviveCountDown.gameObject.SetActive(false);
-        Player.HasCrashed = false;
+        Player.hasCrashed = false;
+        playerSource.Play();
         speedIndicator.transform.DORotate(new Vector3(0, 0, -180), 90).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
         StartCoroutine(IncreaseScore());
-        StartCoroutine(_player.GetComponent<Player>().SpeedIncreaseCoroutine());
-        _crashInit = false;
+        StartCoroutine(player.GetComponent<Player>().SpeedIncreaseCoroutine());
+        StartCoroutine(player.GetComponent<Player>().CarSoundCoroutine());
+        crashInit = false;
     }
 
     public void ShowScoreUI()
     {
-        UIAnimator.SetTrigger("showScore");
+        uiAnimator.SetTrigger(ShowScore);
         var highScore = PlayerPrefs.GetInt("HighScore", 0);
         var currentMoney = PlayerPrefs.GetInt("Money", 0);
         currentMoney += _money;
@@ -175,8 +192,8 @@ public class GameManager : MonoBehaviour
         var currentSceneName = SceneManager.GetActiveScene().name;
         DOTween.KillAll();
         SceneManager.LoadScene(currentSceneName);
-        _spawnPointsIndex.Clear();
-        Player.HasCrashed = false;
+        SpawnPointsIndex.Clear();
+        Player.hasCrashed = false;
     }
 
     private IEnumerator StartGame()
@@ -190,7 +207,7 @@ public class GameManager : MonoBehaviour
         reviveCountDown.text = "1";
         yield return new WaitForSeconds(1);
         reviveCountDown.gameObject.SetActive(false);
-        _player.GetComponent<Player>().enabled = true;
+        player.GetComponent<Player>().enabled = true;
         StartCoroutine(IncreaseScore());
         speedIndicator.transform.DORotate(new Vector3(0, 0, -180), 90).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
         for (int i = 0; i < 10; i++)
@@ -206,14 +223,13 @@ public class GameManager : MonoBehaviour
         currentMaterials[0] = colors[currentColor];
         carRenderer.materials = currentMaterials;
     }
-
+    
     public void GoToMenu()
     {
         DOTween.KillAll();
-        Player.HasCrashed = false;
-        _spawnPointsIndex.Clear();
-        Player.HasCrashed = false;
+        Player.hasCrashed = false;
+        SpawnPointsIndex.Clear();
+        Player.hasCrashed = false;
         SceneManager.LoadScene(0);
     }
-
 }

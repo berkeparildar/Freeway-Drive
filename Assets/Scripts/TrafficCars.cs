@@ -1,36 +1,40 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 public class TrafficCars : MonoBehaviour
 {
-    public Material[] carColors;
-    private MeshRenderer _meshRenderer;
-    private Animator _animator;
-    private GameObject _leftSignal;
-    private GameObject _rightSignal;
-    private bool _canTurnAgain;
-    private bool _turnRight;
-    private bool _turnLeft;
-    private float _speed;
-    private float _turnSpeed;
-    private Player _player;
+    [SerializeField] private Material[] carColors;
+    [SerializeField] private MeshRenderer meshRenderer;
+    [SerializeField] private Animator animator;
+    [SerializeField] private GameObject leftSignal;
+    [SerializeField] private GameObject rightSignal;
+    [SerializeField] private bool canTurnAgain;
+    [SerializeField] private bool turnRight;
+    [SerializeField] private bool turnLeft;
+    [SerializeField] private float speed;
+    [SerializeField] private float turnSpeed;
+    [SerializeField] private Player player;
+    [SerializeField] private bool willPlayHorn;
+    [SerializeField] private AudioSource hornPlayer;
+    private static readonly int Right = Animator.StringToHash("right");
+    private static readonly int Left = Animator.StringToHash("left");
 
-    void Start()
+    private void Start()
     {
-        _meshRenderer = GetComponent<MeshRenderer>();
-        _animator = GetComponent<Animator>();
-        _leftSignal = transform.GetChild(0).gameObject;
-        _rightSignal = transform.GetChild(1).gameObject;
-        _player = GameObject.Find("Player").GetComponent<Player>();
+        player = GameObject.Find("Player").GetComponent<Player>();
         SetColor();
         SetSpeed();
         StartCoroutine(RollPercentileDice());
-        _canTurnAgain = true;
+        canTurnAgain = true;
+        var hornChance =  Random.Range(0, 4);
+        willPlayHorn = hornChance == 2;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         Movement();
         KillIfBehind();
@@ -39,25 +43,30 @@ public class TrafficCars : MonoBehaviour
     private void SetColor()
     {
         var randomNumber = Random.Range(0, carColors.Length);
-        var currentMaterials = _meshRenderer.materials;
+        var currentMaterials = meshRenderer.materials;
         currentMaterials[0] = carColors[randomNumber];
-        _meshRenderer.materials = currentMaterials;
+        meshRenderer.materials = currentMaterials;
+        if (!CompareTag("Truck") && !CompareTag("Tanker")) return;
+        var cargo = transform.GetChild(2);
+        var cargoMats = cargo.GetComponent<MeshRenderer>().materials;
+        cargoMats[0] = carColors[randomNumber];
+        cargo.GetComponent<MeshRenderer>().materials = cargoMats;
     }
 
     private void Movement()
     {
-        transform.Translate(_speed * Time.deltaTime * Vector3.right);
-        if (_turnLeft && transform.position.x != -10 && _canTurnAgain)
+        transform.Translate(speed * Time.deltaTime * Vector3.right);
+        if (turnLeft && Math.Abs(transform.position.x - (-10)) > 2 && canTurnAgain)
         {
-            _canTurnAgain = false;
-            _turnLeft = false;
+            canTurnAgain = false;
+            turnLeft = false;
             StartCoroutine(TurnLeft());
             
         }
-        else if (_turnRight && transform.position.x != -2.5f && _canTurnAgain)
+        else if (turnRight && Math.Abs(transform.position.x - (-2.5f)) > 2 && canTurnAgain)
         {
-            _canTurnAgain = false;
-            _turnRight = false;
+            canTurnAgain = false;
+            turnRight = false;
             StartCoroutine(TurnRight());
             
         }
@@ -70,11 +79,11 @@ public class TrafficCars : MonoBehaviour
             var random = Random.Range(0, 11);
             if (random == 3)
             {
-                _turnRight = true;
+                turnRight = true;
             }
             else if (random == 7)
             {
-                _turnLeft = true;
+                turnLeft = true;
             }
             yield return new WaitForSeconds(4);
         }
@@ -82,55 +91,62 @@ public class TrafficCars : MonoBehaviour
 
     private IEnumerator TurnLeft()
     {
-        _leftSignal.SetActive(true);
+        leftSignal.SetActive(true);
         yield return new WaitForSeconds(0.5f);
-        _leftSignal.SetActive(false);
+        leftSignal.SetActive(false);
         yield return new WaitForSeconds(0.5f);
-        _leftSignal.SetActive(true);
+        leftSignal.SetActive(true);
         yield return new WaitForSeconds(0.5f);
-        _leftSignal.SetActive(false);
+        leftSignal.SetActive(false);
         yield return new WaitForSeconds(0.5f);
-        _animator.SetTrigger("left");
-        transform.DOMoveX(-2.5f, _turnSpeed).SetRelative().OnComplete(() => {_canTurnAgain = true;});
-        _leftSignal.SetActive(true);
+        animator.SetTrigger(Left);
+        transform.DOMoveX(-2.5f, turnSpeed).SetRelative().OnComplete(() => {canTurnAgain = true;});
+        leftSignal.SetActive(true);
         yield return new WaitForSeconds(0.5f);
-        _leftSignal.SetActive(false);
+        leftSignal.SetActive(false);
     }
 
     private IEnumerator TurnRight()
     {
-        _rightSignal.SetActive(true);
+        rightSignal.SetActive(true);
         yield return new WaitForSeconds(0.5f);
-        _rightSignal.SetActive(false);
+        rightSignal.SetActive(false);
         yield return new WaitForSeconds(0.5f);
-        _rightSignal.SetActive(true);
+        rightSignal.SetActive(true);
         yield return new WaitForSeconds(0.5f);
-        _rightSignal.SetActive(false);
+        rightSignal.SetActive(false);
         yield return new WaitForSeconds(0.5f);
-        _animator.SetTrigger("right");
-        transform.DOMoveX(2.5f, _turnSpeed).SetRelative().OnComplete(() => {_canTurnAgain = true;});
-        _rightSignal.SetActive(true);
+        animator.SetTrigger(Right);
+        transform.DOMoveX(2.5f, turnSpeed).SetRelative().OnComplete(() => {canTurnAgain = true;});
+        rightSignal.SetActive(true);
         yield return new WaitForSeconds(0.5f);
-        _rightSignal.SetActive(false);
+        rightSignal.SetActive(false);
     }
 
     private void SetSpeed()
     {
-        var playerSpeed = _player.GetSpeed();
-        _speed = playerSpeed * 0.75f;
-        _turnSpeed = 2;
+        var playerSpeed = player.GetSpeed();
+        speed = playerSpeed * 0.75f;
+        turnSpeed = 2;
     }
 
     private void KillIfBehind()
     {
-        if (_player.transform.position.z > transform.position.z + 10)
+        if (Mathf.Abs(player.transform.position.z - transform.position.z) < 1 && willPlayHorn)
         {
+            hornPlayer.Play();
+            willPlayHorn = false;
+        }
+        if (player.transform.position.z > transform.position.z + 10)
+        {
+            DOTween.Kill(transform);
+            DOTween.instance.DOKill(transform);
             Destroy(this.gameObject);
         }
     }
 
     public void Stop()
     {
-        _speed = 0;
+        speed = 0;
     }
 }

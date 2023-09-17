@@ -2,18 +2,19 @@ using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class PowerUp : MonoBehaviour
 {
-    [SerializeField] private Material _ghostMat;
-    private GameObject _player;
+    [SerializeField] private Material ghostMat;
+    [SerializeField] private GameObject player;
     public DG.Tweening.Core.TweenerCore<Quaternion, Vector3, DG.Tweening.Plugins.Options.QuaternionOptions> turnTween;
-    private bool _isGhost;
-    public GameObject powerUpText;
+    [SerializeField] private bool isGhost;
+    [SerializeField] private GameObject powerUpText;
 
     void Start()
     {
-        _player = GameObject.Find("Player");
+        player = GameObject.Find("Player");
         turnTween = transform.DORotate(new Vector3(0, 180, 0), 2).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
     }
 
@@ -29,9 +30,9 @@ public class PowerUp : MonoBehaviour
             {
                 case "Ghost":
                     StartCoroutine(GhostRoutine());
-                    _isGhost = true;
+                    isGhost = true;
                     var ghostPop = Instantiate(powerUpText, transform.position, Quaternion.identity);
-                    ghostPop.transform.SetParent(_player.transform);
+                    ghostPop.transform.SetParent(player.transform);
                     var colorG = ghostPop.GetComponent<TextMeshPro>().color;
                     var targetColorG = new Color(colorG.r, colorG.g, colorG.b, 0);
                     ghostPop.GetComponent<TextMeshPro>().DOColor(targetColorG, 1);
@@ -39,12 +40,13 @@ public class PowerUp : MonoBehaviour
                         Destroy(ghostPop);
                     });
                     DOTween.Kill(transform);
+                    DOTween.instance.DOKill(transform);
                     transform.GetChild(0).gameObject.SetActive(false);
                     break;
                 case "Handle":
                     IncreaseHandling();
                     var handlingPop = Instantiate(powerUpText, transform.position, Quaternion.identity);
-                    handlingPop.transform.SetParent(_player.transform);
+                    handlingPop.transform.SetParent(player.transform);
                     var color = handlingPop.GetComponent<TextMeshPro>().color;
                     var targetColor = new Color(color.r, color.g, color.b, 0);
                     handlingPop.GetComponent<TextMeshPro>().DOColor(targetColor, 1);
@@ -52,13 +54,14 @@ public class PowerUp : MonoBehaviour
                         Destroy(handlingPop);
                     });
                     DOTween.Kill(transform);
+                    DOTween.instance.DOKill(transform);
                     Destroy(this.gameObject);   
                     break;
                 case "Money":
                     var randomMoney = Random.Range(40, 61);
                     GameManager.IncreaseMoney(randomMoney);
                     var moneyPop = Instantiate(powerUpText, transform.position, Quaternion.identity);
-                    moneyPop.transform.SetParent(_player.transform);
+                    moneyPop.transform.SetParent(player.transform);
                     moneyPop.GetComponent<TextMeshPro>().text = randomMoney + "$";
                     var colorM = moneyPop.GetComponent<TextMeshPro>().color;
                     var targetColorM = new Color(colorM.r, colorM.g, colorM.b, 0);
@@ -67,6 +70,7 @@ public class PowerUp : MonoBehaviour
                         Destroy(moneyPop);
                     });
                     DOTween.Kill(transform);
+                    DOTween.instance.DOKill(transform);
                     Destroy(this.gameObject);
                     break;
             }
@@ -75,32 +79,33 @@ public class PowerUp : MonoBehaviour
 
     private IEnumerator GhostRoutine()
     {
-        _player.GetComponent<BoxCollider>().enabled = false;
-        var playerRenderer = _player.transform.GetChild(0).GetComponent<MeshRenderer>();
+        player.GetComponent<BoxCollider>().enabled = false;
+        var playerRenderer = player.transform.GetChild(0).GetComponent<MeshRenderer>();
         var currentMaterials = playerRenderer.materials;
         Material[] newMaterials = new Material[currentMaterials.Length];
         for (int i = 0; i < newMaterials.Length; i++)
         {
-            newMaterials[i] = _ghostMat;
+            newMaterials[i] = ghostMat;
         }
         playerRenderer.materials = newMaterials;
         yield return new WaitForSeconds(5);
-        _player.GetComponent<BoxCollider>().enabled = true;
+        player.GetComponent<BoxCollider>().enabled = true;
         playerRenderer.materials = currentMaterials;
         Destroy(gameObject);
     }
 
     private void IncreaseHandling()
     {
-        var player = _player.GetComponent<Player>();
+        var player = this.player.GetComponent<Player>();
         player.IncreaseHandling();
     }
 
     private void KillIfBehind()
     {
-        if (_player.transform.position.z > transform.position.z + 10 && !_isGhost)
+        if (player.transform.position.z > transform.position.z + 10 && !isGhost)
         {
             DOTween.Kill(transform);
+            transform.DOKill();
             Destroy(this.gameObject);
         }
     }

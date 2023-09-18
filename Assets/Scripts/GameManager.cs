@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioSource playerSource;
     [SerializeField] private CinemachineVirtualCamera followCamera;
     [SerializeField] private CinemachineVirtualCamera deathCamera;
+    [SerializeField] private AudioSource backgroundMusic;
     public static readonly Dictionary<string, float> SpawnPointsIndex = new();
     public static bool playedAd;
     private static int _currentRoadLocation;
@@ -226,6 +227,8 @@ public class GameManager : MonoBehaviour
     
     public void GoToMenu()
     {
+        backgroundMusic = GameObject.Find("BackgroundMusic").GetComponent<AudioSource>();
+        backgroundMusic.Stop();
         DOTween.KillAll();
         Player.hasCrashed = false;
         SpawnPointsIndex.Clear();

@@ -29,6 +29,10 @@ public class StartMenu : MonoBehaviour
         var currentMats = carModel.GetComponent<MeshRenderer>().materials;
         currentMats[0] = colors[(PlayerPrefs.GetInt("Color", 0))];
         carModel.GetComponent<MeshRenderer>().materials = currentMats;
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
         DontDestroyOnLoad(audioSource.gameObject);
     }
     public void StartGame()

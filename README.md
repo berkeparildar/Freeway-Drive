@@ -18,6 +18,3 @@ Freeway Drive is an exhilarating endless driving game where players take control
 - Customize your car's color using one of the six available color options, each costing 100$.
 - If you crash, you can watch a rewarded ad video to continue the game from where you left off.
 - Reach the highest score possible by surviving as long as you can, combining top speed and survival time.
-
-## Gameplay Video
-[![Gameplay Preview](https://img.youtube.com/vi/u6CHQkcB8Vs/0.jpg)](https://www.youtube.com/watch?v=u6CHQkcB8Vs)

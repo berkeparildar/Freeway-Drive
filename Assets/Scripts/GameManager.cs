@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -43,6 +44,11 @@ public class GameManager : MonoBehaviour
     private static int _score; 
     private static readonly int ShowScore = Animator.StringToHash("showScore");
     private static readonly int Revive = Animator.StringToHash("revive");
+
+    private void Awake()
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+    }
 
     private void Start()
     {

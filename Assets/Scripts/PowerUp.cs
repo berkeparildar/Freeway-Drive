@@ -39,8 +39,6 @@ public class PowerUp : MonoBehaviour
                     ghostPop.transform.DOMoveY(2, 1).SetRelative().OnComplete(() => {
                         Destroy(ghostPop);
                     });
-                    DOTween.Kill(transform);
-                    DOTween.instance.DOKill(transform);
                     transform.GetChild(0).gameObject.SetActive(false);
                     break;
                 case "Handle":
@@ -53,9 +51,7 @@ public class PowerUp : MonoBehaviour
                     handlingPop.transform.DOMoveY(2, 1).SetRelative().OnComplete(() => {
                         Destroy(handlingPop);
                     });
-                    DOTween.Kill(transform);
-                    DOTween.instance.DOKill(transform);
-                    Destroy(this.gameObject);   
+                    gameObject.SetActive(false);
                     break;
                 case "Money":
                     var randomMoney = Random.Range(40, 61);
@@ -69,9 +65,7 @@ public class PowerUp : MonoBehaviour
                     moneyPop.transform.DOMoveY(2, 1).SetRelative().OnComplete(() => {
                         Destroy(moneyPop);
                     });
-                    DOTween.Kill(transform);
-                    DOTween.instance.DOKill(transform);
-                    Destroy(this.gameObject);
+                    gameObject.SetActive(false);
                     break;
             }
         }
@@ -91,7 +85,8 @@ public class PowerUp : MonoBehaviour
         yield return new WaitForSeconds(5);
         player.GetComponent<BoxCollider>().enabled = true;
         playerRenderer.materials = currentMaterials;
-        Destroy(gameObject);
+        transform.GetChild(0).gameObject.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     private void IncreaseHandling()
@@ -104,9 +99,7 @@ public class PowerUp : MonoBehaviour
     {
         if (player.transform.position.z > transform.position.z + 10 && !isGhost)
         {
-            DOTween.Kill(transform);
-            transform.DOKill();
-            Destroy(this.gameObject);
+            gameObject.SetActive(false);
         }
     }
 }

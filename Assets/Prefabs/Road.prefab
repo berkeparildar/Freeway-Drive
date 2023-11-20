@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f07d57754c02d48138a72e5cf5841524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _chanceToSpawn: 0
   cars:
   - {fileID: 2285818926960363535, guid: 0a21b8e882c3e4a6bada2e93956e5591, type: 3}
   - {fileID: 7115072982540304649, guid: 286d1aa26c49d429fae46e9b6e3a4bea, type: 3}
@@ -58,6 +59,7 @@ MonoBehaviour:
   - {fileID: 4371645819915589052, guid: cdd7bb473aede42fdb513628629adab6, type: 3}
   - {fileID: 8440209836246745544, guid: 451a25e4056494a34bc928cce6c90ceb, type: 3}
   - {fileID: 130408237353975302, guid: 3a606ad237eef49cda986594f6a99f66, type: 3}
+  carContainer: {fileID: 0}
 --- !u!1 &4617543439042706458
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,6 +105,10 @@ PrefabInstance:
     - target: {fileID: 170826, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
       propertyPath: m_Name
       value: Straight
+      objectReference: {fileID: 0}
+    - target: {fileID: 170826, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 436234, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -166,6 +172,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Straight
       objectReference: {fileID: 0}
+    - target: {fileID: 170826, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 436234, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -227,6 +237,10 @@ PrefabInstance:
     - target: {fileID: 170826, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
       propertyPath: m_Name
       value: Straight
+      objectReference: {fileID: 0}
+    - target: {fileID: 170826, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 436234, guid: 3981927452c32484d9640b2bf295fc6c, type: 3}
       propertyPath: m_LocalPosition.x

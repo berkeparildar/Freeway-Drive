@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
         _score = 0;
         _money = 0;
         _playerTargetPos = 15;
-        _currentRoadLocation = 90;
+        _currentRoadLocation = 150;
         SpawnPointsIndex.Add("Bus", 8.32f);
         SpawnPointsIndex.Add("Mini", 7.922f);
         SpawnPointsIndex.Add("Golf", 7.895f);
@@ -85,10 +85,12 @@ public class GameManager : MonoBehaviour
 
     private void GenerateRoad()
     {
-        var createdRoad = Instantiate(roadPrefab, new Vector3(0, 0, _currentRoadLocation), Quaternion.identity);
-        createdRoad.transform.SetParent(roadContainer.transform);
+        var lastRoad = roadContainer.transform.GetChild(0).gameObject;
+        lastRoad.transform.position = new Vector3(0, 0, _currentRoadLocation);
+        lastRoad.GetComponent<Road>().Initialize();
+        lastRoad.transform.SetParent(null);
+        lastRoad.transform.SetParent(roadContainer.transform);
         _currentRoadLocation += 15;
-        Destroy(roadContainer.transform.GetChild(0).gameObject);
     }
 
     public static void IncreaseMoney(int money)
@@ -217,10 +219,6 @@ public class GameManager : MonoBehaviour
         player.GetComponent<Player>().enabled = true;
         StartCoroutine(IncreaseScore());
         speedIndicator.transform.DORotate(new Vector3(0, 0, -180), 90).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
-        for (int i = 0; i < 10; i++)
-        {
-            GenerateRoad();
-        }
     }
 
     private void SetColor()

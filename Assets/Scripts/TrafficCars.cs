@@ -23,9 +23,13 @@ public class TrafficCars : MonoBehaviour
     private static readonly int Right = Animator.StringToHash("right");
     private static readonly int Left = Animator.StringToHash("left");
 
-    private void Start()
+    private void Awake()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
+    }
+
+    private void OnEnable()
+    {
         SetColor();
         SetSpeed();
         StartCoroutine(RollPercentileDice());
@@ -33,6 +37,7 @@ public class TrafficCars : MonoBehaviour
         var hornChance =  Random.Range(0, 4);
         willPlayHorn = hornChance == 2;
     }
+
 
     private void Update()
     {
@@ -139,9 +144,7 @@ public class TrafficCars : MonoBehaviour
         }
         if (player.transform.position.z > transform.position.z + 10)
         {
-            DOTween.Kill(transform);
-            DOTween.instance.DOKill(transform);
-            Destroy(this.gameObject);
+            gameObject.SetActive(false);
         }
     }
 

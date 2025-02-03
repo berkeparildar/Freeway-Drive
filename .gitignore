@@ -205,3 +205,4 @@ sysinfo.txt
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/rider,macos,unity,visualstudiocode
+/.vscode

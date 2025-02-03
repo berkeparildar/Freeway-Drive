@@ -12,10 +12,13 @@ public class PowerUp : MonoBehaviour
     [SerializeField] private bool isGhost;
     [SerializeField] private GameObject powerUpText;
 
-    void Start()
+    private void Start()
     {
         player = GameObject.Find("Player");
-        turnTween = transform.DORotate(new Vector3(0, 180, 0), 2).SetRelative().SetLoops(-1, LoopType.Incremental).SetEase(Ease.Linear);
+        turnTween = transform.DORotate(new Vector3(0, 180, 0), 2)
+            .SetRelative().
+            SetLoops(-1, LoopType.Incremental).
+            SetEase(Ease.Linear);
     }
 
     private void Update() {
@@ -55,7 +58,7 @@ public class PowerUp : MonoBehaviour
                     break;
                 case "Money":
                     var randomMoney = Random.Range(40, 61);
-                    GameManager.IncreaseMoney(randomMoney);
+                    //GameManager.IncreaseMoney(randomMoney);
                     var moneyPop = Instantiate(powerUpText, transform.position, Quaternion.identity);
                     moneyPop.transform.SetParent(player.transform);
                     moneyPop.GetComponent<TextMeshPro>().text = randomMoney + "$";
@@ -91,7 +94,7 @@ public class PowerUp : MonoBehaviour
 
     private void IncreaseHandling()
     {
-        var player = this.player.GetComponent<Player>();
+        var player = this.player.GetComponent<OldPlayer>();
         player.IncreaseHandling();
     }
 

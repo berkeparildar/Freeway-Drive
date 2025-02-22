@@ -1,3 +1,4 @@
+using Game;
 using InputSystem;
 using Player;
 using Scripts.InputSystem;

@@ -1,4 +1,6 @@
+using System;
 using Scripts.InputSystem;
+using Scripts.Player;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -20,6 +22,17 @@ namespace InputSystem
         private void Awake()
         {
             inputController = new PlayerInputController();
+            PlayerManager.PlayerCrashed += OnPlayerCrashed;
+        }
+
+        private void OnDestroy()
+        {
+            PlayerManager.PlayerCrashed -= OnPlayerCrashed;
+        }
+
+        private void OnPlayerCrashed()
+        {
+            this.enabled = false;
         }
 
         private void OnEnable()
@@ -40,13 +53,11 @@ namespace InputSystem
 
         private void OnTouchStarted(InputAction.CallbackContext context)
         {
-            Debug.LogWarning("OnTouchStarted");
             startPosition = inputController.Player.PrimaryPosition.ReadValue<Vector2>();
         }
 
         private void OnTouchEnded(InputAction.CallbackContext context)
         {
-            Debug.LogWarning("OnTouchEnded");
             Vector2 endPosition = inputController.Player.PrimaryPosition.ReadValue<Vector2>();
 
             Vector2 swipeVector = endPosition - startPosition;
@@ -55,7 +66,6 @@ namespace InputSystem
             {
                 return;
             }
-            Debug.LogWarning(swipeVector);
             if (swipeVector.x > 0)
             {
                 PlayerSwiped.Invoke(SwipeDirection.Right);

@@ -1,4 +1,5 @@
 using System;
+using CollectibleSystem;
 using UnityEngine;
 
 namespace Scripts.Player
@@ -15,11 +16,13 @@ namespace Scripts.Player
         private void Awake()
         {
             PlayerManager.PlayerCrashed += OnPlayerCrashed;
+            CollectibleHandlingPowerUp.CollectedHandlingPowerUp += OnCollectedHandlingPowerUp;
         }
 
         private void OnDestroy()
         {
             PlayerManager.PlayerCrashed -= OnPlayerCrashed;
+            CollectibleHandlingPowerUp.CollectedHandlingPowerUp -= OnCollectedHandlingPowerUp;
         }
 
         public void TurnLeft()
@@ -30,6 +33,11 @@ namespace Scripts.Player
         public void TurnRight()
         {
             animator.SetTrigger(Right);
+        }
+        
+        private void OnCollectedHandlingPowerUp(float speedMultiplier)
+        {
+            animator.speed *= speedMultiplier;
         }
 
         public void IncreaseGear()

@@ -1,5 +1,4 @@
 using System.Collections;
-using DG.Tweening;
 using Scripts.Player;
 using TMPro;
 using UnityEngine;
@@ -17,8 +16,6 @@ namespace Game
         [SerializeField] private TextMeshProUGUI allTimeScore;
         [SerializeField] private TextMeshProUGUI countDownText;
         [SerializeField] private GameObject recordText;
-        [SerializeField] private GameObject speedIndicator;
-        [SerializeField] private Animator animator;
         
         [SerializeField] private GameObject gameUI;
         [SerializeField] private GameObject menuUI;
@@ -34,7 +31,6 @@ namespace Game
         private void Awake()
         {
             GameManager.StartingGame += ShowStartCountDown;
-            MoneyManager.CollectedMoney += UpdateMoney;
             PlayerManager.PlayerCrashed += OnPlayerCrashed;
             
             currentMoney = PlayerPrefs.GetInt("Money", 0);
@@ -44,7 +40,6 @@ namespace Game
         private void OnDestroy()
         {
             GameManager.StartingGame -= ShowStartCountDown;
-            MoneyManager.CollectedMoney -= UpdateMoney;
             PlayerManager.PlayerCrashed -= OnPlayerCrashed;
         }
 
@@ -61,36 +56,13 @@ namespace Game
                 countDownText.text = "1";
                 yield return new WaitForSeconds(1);
                 countDownText.gameObject.SetActive(false);
-                speedIndicator.transform.DORotate(new Vector3(0, 0, -180), 90)
-                    .SetRelative()
-                    .SetLoops(-1, LoopType.Incremental)
-                    .SetEase(Ease.Linear);
             }
-        }
-
-        private void ShowScoreUI()
-        {
-            animator.SetTrigger(ShowScore);
-            currentMoney += money;
-            if (score > highScore)
-            {
-                allTimeScore.text = score.ToString();
-                recordText.SetActive(true);
-            }
-            else
-            {
-                allTimeScore.text = highScore.ToString();
-            }
-            collectedMoney.text = money.ToString();
-            totalMoney.text = currentMoney.ToString();
-            currentScore.text = score.ToString();
         }
         
         private void OnPlayerCrashed()
         {
             gameUI.SetActive(false);
             menuUI.SetActive(true);
-            ShowScoreUI();
         }
 
         public void UpdateScore(int score)
@@ -104,10 +76,10 @@ namespace Game
             speedText.text = speed.ToString();
         }
 
-        private void UpdateMoney(int money)
+        public void UpdateMoney(int money)
         {
             this.money += money;
-            moneyText.text = money.ToString();
+            moneyText.text = this.money.ToString();
         }
     }
 }

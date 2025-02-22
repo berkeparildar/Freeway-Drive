@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using CollectibleSystem;
 using DG.Tweening;
 using Game;
 using Scripts.Player;
@@ -15,17 +16,13 @@ namespace Player
 
         private Tween turnRightTween;
         private Tween turnLeftTween;
-
-        private void Awake()
-        {
-            PlayerManager.PlayerCrashed += OnPlayerCrashed;
-        }
-        
         private void OnEnable()
         {
+            PlayerManager.PlayerCrashed += OnPlayerCrashed;
+            CollectibleHandlingPowerUp.CollectedHandlingPowerUp += OnCollectedHandlingPowerUp;
             StartCoroutine(SpeedIncreaseRoutine());
         }
-        
+
         private void Update()
         {
             transform.Translate(speed * Time.deltaTime * Vector3.forward);
@@ -34,11 +31,13 @@ namespace Player
         private void OnDisable()
         {
             StopAllCoroutines();
-        }
-
-        private void OnDestroy()
-        {
             PlayerManager.PlayerCrashed -= OnPlayerCrashed;
+            CollectibleHandlingPowerUp.CollectedHandlingPowerUp -= OnCollectedHandlingPowerUp;
+        }
+        
+        private void OnCollectedHandlingPowerUp(float speedMultiplier)
+        {
+            turnSpeed *= speedMultiplier;
         }
 
         private void OnPlayerCrashed()

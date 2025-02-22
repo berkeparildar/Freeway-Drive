@@ -1,4 +1,5 @@
 using System;
+using CollectibleSystem;
 using Scripts.Player;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,18 +10,16 @@ namespace Game
     {
         [SerializeField] private int money;
         [SerializeField] private UIManager uiManager;
-
-        public static UnityAction<int> CollectedMoney;
-
+        
         private void Awake()
         {
-            CollectedMoney += OnCollectedMoney;
+            CollectibleMoney.CollectedMoney += OnCollectedMoney;
             PlayerManager.PlayerCrashed += OnPlayerCrashed;
         }
         
         private void OnDestroy()
         {
-            CollectedMoney -= OnCollectedMoney;
+            CollectibleMoney.CollectedMoney -= OnCollectedMoney;
         }
 
         private void OnPlayerCrashed()
@@ -33,6 +32,7 @@ namespace Game
         private void OnCollectedMoney(int money)
         {
             this.money += money;
+            uiManager.UpdateMoney(money);
         }
     }
 }

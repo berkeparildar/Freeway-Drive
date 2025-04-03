@@ -3435,8 +3435,8 @@ MonoBehaviour:
   moneyText: {fileID: 6957050325641700950}
   speedText: {fileID: 1639531082}
   scoreText: {fileID: 386445180}
-  collectedMoney: {fileID: 959987993}
-  totalMoney: {fileID: 112752746}
+  collectedMoney: {fileID: 810960273}
+  totalMoney: {fileID: 995709011}
   currentScore: {fileID: 838990755}
   allTimeScore: {fileID: 345734467}
   countDownText: {fileID: 288834072}

@@ -32,8 +32,6 @@ namespace Game
         {
             GameManager.StartingGame += ShowStartCountDown;
             PlayerManager.PlayerCrashed += OnPlayerCrashed;
-            
-            currentMoney = PlayerPrefs.GetInt("Money", 0);
             highScore = PlayerPrefs.GetInt("HighScore", 0);
         }
 
@@ -63,6 +61,16 @@ namespace Game
         {
             gameUI.SetActive(false);
             menuUI.SetActive(true);
+            collectedMoney.text = money.ToString();
+            currentMoney = PlayerPrefs.GetInt("Money", 0);
+            totalMoney.text = currentMoney.ToString();
+            currentScore.text = score.ToString();
+            highScore = PlayerPrefs.GetInt("HighScore", 0);
+            allTimeScore.text = highScore.ToString();
+            if (score >= highScore)
+            {
+                recordText.gameObject.SetActive(true);
+            }
         }
 
         public void UpdateScore(int score)

@@ -121,12 +121,16 @@ namespace TrafficSystem
             leftSignal.SetActive(false);
             yield return new WaitForSeconds(0.5f);
             animator.SetTrigger(Left);
-            yield return transform.DOMoveX(-2.5f, turnSpeed)
-                .SetRelative()
-                .WaitForCompletion();
-            leftSignal.SetActive(true);
-            yield return new WaitForSeconds(0.5f);
-            leftSignal.SetActive(false);
+            Sequence seq = DOTween.Sequence();
+            seq.Append(transform.DOMoveX(-2.5f, turnSpeed)
+                .SetRelative());
+            seq.Join(
+                DOTween.Sequence()
+                    .AppendCallback(() => leftSignal.SetActive(true))
+                    .AppendInterval(0.5f)
+                    .AppendCallback(() => leftSignal.SetActive(false))
+            );
+            yield return seq.WaitForCompletion();
         }
 
         private IEnumerator TurnRightRoutine()
@@ -141,12 +145,16 @@ namespace TrafficSystem
             rightSignal.SetActive(false);
             yield return new WaitForSeconds(0.5f);
             animator.SetTrigger(Right);
-            yield return transform.DOMoveX(2.5f, turnSpeed)
-                .SetRelative()
-                .WaitForCompletion();
-            rightSignal.SetActive(true);
-            yield return new WaitForSeconds(0.5f);
-            rightSignal.SetActive(false);
+            Sequence seq = DOTween.Sequence();
+            seq.Append(transform.DOMoveX(2.5f, turnSpeed)
+                .SetRelative());
+            seq.Join(
+                DOTween.Sequence()
+                    .AppendCallback(() => rightSignal.SetActive(true))
+                    .AppendInterval(0.5f)
+                    .AppendCallback(() => rightSignal.SetActive(false))
+            );
+            yield return seq.WaitForCompletion();
         }
 
         private void GetSpeed()

@@ -10,13 +10,8 @@ namespace InputSystem
     public class InputManager : MonoBehaviour
     {
         private PlayerInputController inputController;
-
-        // Minimum distance (in screen pixels) to consider it a valid swipe
         [SerializeField] private float minimumSwipeDistance = 192;
-
         public static UnityAction<SwipeDirection> PlayerSwiped;
-
-        // We’ll store the touch start position here
         private Vector2 startPosition;
 
         private void Awake()

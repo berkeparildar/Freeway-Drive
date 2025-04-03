@@ -22,6 +22,7 @@ namespace Game
         
         [SerializeField] private int highScore;
         [SerializeField] private int currentMoney;
+        [SerializeField] private float speed;
         
         private static readonly int ShowScore = Animator.StringToHash("showScore");
 
@@ -30,6 +31,7 @@ namespace Game
 
         private void Awake()
         {
+            speed = 20;
             GameManager.StartingGame += ShowStartCountDown;
             PlayerManager.PlayerCrashed += OnPlayerCrashed;
             highScore = PlayerPrefs.GetInt("HighScore", 0);
@@ -79,9 +81,10 @@ namespace Game
             scoreText.text = score.ToString();
         }
 
-        public void UpdateSpeed(int speed)
+        public void UpdateSpeed()
         {
-            speedText.text = speed.ToString();
+            speed += 0.5f;
+            speedText.text = ((int)speed).ToString();
         }
 
         public void UpdateMoney(int money)

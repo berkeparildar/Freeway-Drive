@@ -3445,6 +3445,7 @@ MonoBehaviour:
   menuUI: {fileID: 720132152}
   highScore: 0
   currentMoney: 0
+  speed: 0
 --- !u!1 &1426473667
 GameObject:
   m_ObjectHideFlags: 0

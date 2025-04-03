@@ -76,8 +76,8 @@ namespace Player
         {
             while (true)
             {
+                uiManager.UpdateSpeed();
                 speed += 0.2f;
-                uiManager.UpdateSpeed((int)speed);
                 GameManager.PlayerSpeed = speed;
                 yield return new WaitForSeconds(1);
             }

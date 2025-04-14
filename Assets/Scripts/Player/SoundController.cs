@@ -40,6 +40,9 @@ namespace Player
             audioSource.loop = false;
             audioSource.pitch = 1;
             audioSource.clip = crashSound;
+            audioSource.volume -= 0.3f;
+            targetPitch = 10;
+            StopCoroutine(CarSoundRoutine());
             audioSource.Play();
         }
 

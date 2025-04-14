@@ -208,3 +208,11 @@ sysinfo.txt
 /.vscode
 *.keystore
 *.pem
+/Assets/ExternalDependencyManager
+/Assets/GoogleMobileAds
+Assets/GoogleMobileAds.meta
+Assets/ExternalDependencyManager.meta
+/Assets/Plugins/Android
+Assets/Plugins/Android.meta
+Assets/Plugins/iOS.meta
+/Assets/Plugins/iOS

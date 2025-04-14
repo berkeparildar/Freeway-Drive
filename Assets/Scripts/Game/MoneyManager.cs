@@ -20,6 +20,7 @@ namespace Game
         private void OnDestroy()
         {
             CollectibleMoney.CollectedMoney -= OnCollectedMoney;
+            PlayerManager.PlayerCrashed -= OnPlayerCrashed;
         }
 
         private void OnPlayerCrashed()

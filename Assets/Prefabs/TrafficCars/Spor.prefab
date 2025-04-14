@@ -301,6 +301,7 @@ MonoBehaviour:
   player: {fileID: 0}
   turnCooldown: 0
   laneIndex: 0
+  cargoRenderer: {fileID: 0}
 --- !u!65 &1644602398788061562
 BoxCollider:
   m_ObjectHideFlags: 0

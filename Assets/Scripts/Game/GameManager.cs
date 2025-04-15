@@ -1,4 +1,5 @@
 using System.Collections;
+using Cinemachine;
 using DG.Tweening;
 using InputSystem;
 using TrafficSystem;
@@ -15,6 +16,7 @@ namespace Game
         [SerializeField] private Road[] roads;
         [SerializeField] private int roadIndex;
         [SerializeField] private InputManager inputManager;
+        [SerializeField] private CinemachineVirtualCamera startCamera;
         private int currentRoadLocation;
         private int playerTargetPos;
         public static float PlayerSpeed;
@@ -24,6 +26,7 @@ namespace Game
 
         private void Awake()
         {
+            Debug.Log(startCamera.Priority);
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = 60;
         }
@@ -33,6 +36,7 @@ namespace Game
             playerTargetPos = -35;
             currentRoadLocation = 105;
             StartCoroutine(StartGame());
+            StartCoroutine(StartCamera());
         }
 
         private void Update()
@@ -70,6 +74,12 @@ namespace Game
             yield return new WaitForSeconds(3);
             GameStarted?.Invoke();
             inputManager.gameObject.SetActive(true);
+        }
+
+        private IEnumerator StartCamera()
+        {
+            yield return new WaitForSeconds(0.1f);
+            startCamera.Priority = 1;
         }
     
         public void GoToMenu()

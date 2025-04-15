@@ -209,13 +209,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7676851694304782951}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40dd602cdb1e3490d8e81151ab8a77f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
-  turnSpeed: 2
+  speed: 10
+  turnSpeed: 1.5
   uiManager: {fileID: 0}
 --- !u!114 &7801696764931074579
 MonoBehaviour:
@@ -505,6 +505,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 396914776627610600}
     m_Modifications:
+    - target: {fileID: 1348722331621923278, guid: b8f7e5d9f0c5b422f8e31152b909ec3c, type: 3}
+      propertyPath: m_Name
+      value: WheelBL
+      objectReference: {fileID: 0}
     - target: {fileID: 1600077524074782120, guid: b8f7e5d9f0c5b422f8e31152b909ec3c, type: 3}
       propertyPath: m_Name
       value: Car
@@ -549,6 +553,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3247827038803179915, guid: b8f7e5d9f0c5b422f8e31152b909ec3c, type: 3}
+      propertyPath: m_Name
+      value: WheelBR
+      objectReference: {fileID: 0}
+    - target: {fileID: 4435644093118308934, guid: b8f7e5d9f0c5b422f8e31152b909ec3c, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4add69fc6d74a5946ae4c9a81ed429ef, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

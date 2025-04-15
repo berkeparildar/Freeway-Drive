@@ -9,6 +9,8 @@ namespace Game
     {
         [SerializeField] private int score;
         [SerializeField] private UIManager uiManager;
+        [SerializeField] private PlayerManager player;
+        private bool canIncreaseScore;
 
         private void Awake()
         {
@@ -21,10 +23,19 @@ namespace Game
             GameManager.GameStarted -= OnGameStarted;
             PlayerManager.PlayerCrashed -= OnPlayerCrashed;
         }
-        
+
+        private void Update()
+        {
+            if (canIncreaseScore)
+            {
+                score = (int)player.transform.position.z / 10;
+                uiManager.UpdateScore(score);
+            }
+        }
+
         private void OnPlayerCrashed()
         {
-            StopCoroutine(IncreaseScore());
+            canIncreaseScore = false;
             var oldScore = PlayerPrefs.GetInt("HighScore", 0);
             if (score > oldScore)
             {
@@ -34,17 +45,7 @@ namespace Game
 
         private void OnGameStarted()
         {
-            StartCoroutine(IncreaseScore());
-        }
-
-        private IEnumerator IncreaseScore()
-        {
-            while (true)
-            {
-                score += 1;
-                uiManager.UpdateScore(score);
-                yield return new WaitForSeconds(0.2f);
-            }
+            canIncreaseScore = true;
         }
 
         public int GetScore()

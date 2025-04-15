@@ -30,8 +30,8 @@ namespace Game
 
         private void Start()
         {
-            playerTargetPos = 35;
-            currentRoadLocation = 175;
+            playerTargetPos = -35;
+            currentRoadLocation = 105;
             StartCoroutine(StartGame());
         }
 

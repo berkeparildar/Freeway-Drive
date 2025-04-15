@@ -13,7 +13,7 @@ namespace TrafficSystem
             chanceToSpawn = Random.Range(0, 6);
             switch (chanceToSpawn)
             {
-                case < 2:
+                case <= 3:
                     InstantiateCar();
                     break;
                 case > 3:

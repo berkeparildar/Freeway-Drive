@@ -37,7 +37,9 @@ namespace Scripts.Player
         
         private void OnCollectedHandlingPowerUp(float speedMultiplier)
         {
-            animator.speed *= speedMultiplier;
+            Debug.Log("Collected handling amount of  " + speedMultiplier);
+            animator.speed /= speedMultiplier;
+            Debug.Log(animator.speed);
         }
 
         public void IncreaseGear()

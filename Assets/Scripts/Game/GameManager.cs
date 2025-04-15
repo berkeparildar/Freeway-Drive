@@ -1,5 +1,6 @@
 using System.Collections;
 using DG.Tweening;
+using InputSystem;
 using TrafficSystem;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,6 +14,7 @@ namespace Game
         [SerializeField] private GameObject player;
         [SerializeField] private Road[] roads;
         [SerializeField] private int roadIndex;
+        [SerializeField] private InputManager inputManager;
         private int currentRoadLocation;
         private int playerTargetPos;
         public static float PlayerSpeed;
@@ -67,6 +69,7 @@ namespace Game
             StartingGame?.Invoke();
             yield return new WaitForSeconds(3);
             GameStarted?.Invoke();
+            inputManager.gameObject.SetActive(true);
         }
     
         public void GoToMenu()

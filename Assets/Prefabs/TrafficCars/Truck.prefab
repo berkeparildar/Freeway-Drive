@@ -294,8 +294,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 4add69fc6d74a5946ae4c9a81ed429ef, type: 2}
   meshRenderer: {fileID: 4393671716684798047}
   animator: {fileID: 1711539538181869027}
-  leftSignal: {fileID: 5564048481844603931}
-  rightSignal: {fileID: 6114944146180270830}
+  leftSignal: {fileID: 6114944146180270830}
+  rightSignal: {fileID: 5564048481844603931}
   speed: 0
   turnSpeed: 0
   player: {fileID: 0}

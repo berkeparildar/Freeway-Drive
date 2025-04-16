@@ -12,7 +12,9 @@ namespace InputSystem
         private PlayerInputController inputController;
         [SerializeField] private float minimumSwipeDistance = 192;
         public static UnityAction<SwipeDirection> PlayerSwiped;
+        public static UnityAction PlayerSwipedForFirstTime;
         private Vector2 startPosition;
+        private bool firstSwipe = true;
 
         private void Awake()
         {
@@ -60,6 +62,12 @@ namespace InputSystem
             if (swipeVector.magnitude < minimumSwipeDistance)
             {
                 return;
+            }
+
+            if (firstSwipe)
+            {
+                firstSwipe = false;
+                PlayerSwipedForFirstTime?.Invoke();
             }
             if (swipeVector.x > 0)
             {

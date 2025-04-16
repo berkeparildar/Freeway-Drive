@@ -1,7 +1,10 @@
 using System.Collections;
+using CollectibleSystem;
+using InputSystem;
 using Scripts.Player;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game
 {
@@ -16,6 +19,8 @@ namespace Game
         [SerializeField] private TextMeshProUGUI allTimeScore;
         [SerializeField] private TextMeshProUGUI countDownText;
         [SerializeField] private GameObject recordText;
+        [SerializeField] private Image ghostTimerImage;
+        [SerializeField] private GameObject inputImage;
         
         [SerializeField] private GameObject gameUI;
         [SerializeField] private GameObject menuUI;
@@ -34,13 +39,36 @@ namespace Game
             speed = 20;
             GameManager.StartingGame += ShowStartCountDown;
             PlayerManager.PlayerCrashed += OnPlayerCrashed;
+            CollectibleGhostPowerUp.CollectedGhostPowerUp += OnCollectedGhostPowerUp;
+            InputManager.PlayerSwipedForFirstTime += DisableInputImage;
             highScore = PlayerPrefs.GetInt("HighScore", 0);
+        }
+
+        private void OnCollectedGhostPowerUp(int duration)
+        {
+            ghostTimerImage.gameObject.SetActive(true);
+            StartCoroutine(GhostRoutine());
+            return;
+            IEnumerator GhostRoutine()
+            {
+                var passedTime = 0f;
+                while (passedTime <= duration)
+                {
+                    passedTime += Time.deltaTime;
+                    ghostTimerImage.fillAmount = (duration - passedTime) / duration;
+                    yield return null; 
+                }
+                ghostTimerImage.gameObject.SetActive(false);
+                ghostTimerImage.fillAmount = 1f;
+            }
         }
 
         private void OnDestroy()
         {
             GameManager.StartingGame -= ShowStartCountDown;
             PlayerManager.PlayerCrashed -= OnPlayerCrashed;
+            InputManager.PlayerSwipedForFirstTime -= DisableInputImage;
+            CollectibleGhostPowerUp.CollectedGhostPowerUp -= OnCollectedGhostPowerUp;
         }
 
         private void ShowStartCountDown()
@@ -56,6 +84,7 @@ namespace Game
                 countDownText.text = "1";
                 yield return new WaitForSeconds(1);
                 countDownText.gameObject.SetActive(false);
+                inputImage.SetActive(true);
             }
         }
         
@@ -73,6 +102,11 @@ namespace Game
             {
                 recordText.gameObject.SetActive(true);
             }
+        }
+
+        private void DisableInputImage()
+        {
+            inputImage.SetActive(false);
         }
 
         public void UpdateScore(int score)
